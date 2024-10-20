@@ -1,23 +1,14 @@
-import { Activity } from "../types"
-import { categories } from "../data/categories"
-
-import { useMemo } from "react"
 import { PencilSquareIcon, XCircleIcon} from '@heroicons/react/24/outline'
-import { ActivityActions } from "../reducers/activity-reducer"
+import { useActivity } from "../hooks/useActivity"
 
-type ActivityProps = {
-    activities: Activity[],
-    dispatch : React.Dispatch<ActivityActions>
-}
 
-const ActivityList = ({activities, dispatch} : ActivityProps) => {
 
-    const categoryName = useMemo(()=> 
-        (category: Activity['category'])=> categories.map(cat => cat.id === category? cat.name : '')
-        , [activities])
+const ActivityList = () => {
 
-    const isEmptyActivities = useMemo(()=> activities.length === 0 , [activities])
+    const {state, dispatch, isEmptyActivities, categoryName} = useActivity()
+    
 
+    
   return (
     <>
         <h2 className="text-4xl font-bold text-slate-600 text-center">
@@ -26,7 +17,7 @@ const ActivityList = ({activities, dispatch} : ActivityProps) => {
 
         { isEmptyActivities
             ? <p className="  mt-5 text-center">No hay actividades aún...</p>
-            :activities.map( activity => (
+            :state.activities.map( activity => (
                 <div 
                     key={activity.id}
                     className="px-5 py-10 bg-white mt-5 flex justify-between shadow"
@@ -49,7 +40,16 @@ const ActivityList = ({activities, dispatch} : ActivityProps) => {
 
                     <div className="flex gap-5 items-center">
                             <button
-                                onClick={()=>dispatch({type:'save-activeId', payload: {id: activity.id}})}
+                                onClick={() => {
+                                    // Ejecutar el dispatch
+                                    dispatch({ type: 'save-activeId', payload: { id: activity.id } });
+                                
+                                    // Desplazarse a la parte superior de la página
+                                    window.scrollTo({
+                                      top: 0,
+                                      behavior: 'smooth'  // Desplazamiento suave
+                                    });
+                                  }}
                             >
                                 <PencilSquareIcon
                                     className="h-8 w-8 text-gray-800"
